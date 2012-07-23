@@ -3,47 +3,40 @@ package TemplateEngine;
 use strict;
 use warnings;
 use utf8;
-use Encode qw/encode decode/;
 use HTML::Entities;
 use 5.010;
 
-my $file_name;
+binmode(STDOUT, ":utf8"); #出力をutf8に #Wide character in print対策
+
 sub new {
     my ($class , %data) = @_; #class名とハッシュ値が入る
     my $self = {%data};
-    $file_name = $data{'file'};
-    die "TemplateEngine -> new error! (Please add the hash.Key is file.)" unless defined $file_name;
     # classとデータを結びつける
     return bless $self, $class;
 }
 
 sub render {
-    my ($class , $data) = @_;
+    my ($this , $data) = @_;
 
     #TMP_HTMLとして、テンプレファイルを開く
+    my $file_name = $this -> {file}; #newで紐づけたfileを取得
     open TMP_HTML , $file_name or die "Can't open '$file_name': $!";
     my @html = <TMP_HTML>;
 
-    my %hash = %$data;
+    my %hash = %$data; #リファレンスをhashに変換
 
-    #入力データをutf8にエンコード処理する
+    #入力文字列をhtmlエスケープ
     foreach(keys %hash) {
-        #$hash{$_} = encode('UTF-8', $hash{$_});
-        Encode::_utf8_off($hash{$_}); #Cannot decode string with wide characters対策
-        $hash{$_} = decode( 'utf8', $hash{$_} );
+        $hash{$_} = encode_entities($hash{$_} , qw(&<>"'));
     }
-
-    foreach(keys %hash) {
-        foreach(@html) {
-            if(/{%\s*(?<name>\w+)\s*%}/) {
-                #実際に表示するようにhtmlエスケープ処理して結合($` , $'は<title> , </title>など)
-                my $value = $` . encode('utf8' , encode_entities($hash{$+{name}} , qw(&<>"'))) . $';
-                $_ = $value;
-            }
-        }
+    
+    my $out_html; #out用html
+    foreach(@html) {
+        s/{%\s*(?<name>\w+)\s*%}/$hash{$+{name}}/g; #置換
+        $out_html .= $_; #out用htmlに付け足して行く
     }
     close TMP_HTML;
-    return @html; #置換済みhtml文字列を返す
+    return $out_html; #置換済みhtml文字列を返す
 }
 
 

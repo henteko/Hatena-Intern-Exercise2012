@@ -28,4 +28,5 @@ cmp_ok $template->render({
     content => 'これはコンテンツです。&<>"',
 }), 'eq', $expected; 
 
+
 done_testing();
