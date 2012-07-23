@@ -32,15 +32,34 @@ sub render {
     
     my $out_html; #out用html
     foreach(@html) {
-        if(/{!!.*!!}/) {
-            #テンプレートコメントは削除する為省略する
-            next;
-        }
-        s/{%\s*(?<name>\w+)\s*%}/$hash{$+{name}}/g; #置換
-        $out_html .= $_; #out用htmlに付け足して行く
+        if(&comment_delete($_)) {next;} #テンプレートコメントは削除する為次に進む
+        $out_html .= &replace_variable($_,\%hash); #変数置換関数呼び出し #out用htmlに付け足して行く
     }
     close TMP_HTML;
     return $out_html; #置換済みhtml文字列を返す
+}
+
+#変数置換関数
+#引数:
+#1:置換対象文字列
+#2:置換後文字列のハッシュリファレンス
+#返り値:
+#置換後文字列
+sub replace_variable {
+    my($s , $refa) = @_;
+    my %hash = %$refa;
+    $s =~ s/{%\s*(?<name>\w+)\s*%}/$hash{$+{name}}/g;
+    return $s;
+}
+
+#テンプレートコメント削除関数
+#引数:
+#1:判断対象文字列
+#返り値:
+#true or false
+sub comment_delete {
+    my($s) = @_;
+    return $s =~ /{!!.*!!}/;
 }
 
 
