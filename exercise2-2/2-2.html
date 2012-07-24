@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="template.js"></script>
+    <script src="http://www3264ue.sakura.ne.jp/json_to_js/?url=https://api.twitter.com/1/statuses/public_timeline.json"></script>
+    <script src="Twi_client.js"></script>
+    <script src="2-2.js"></script>
+    <body>
+      <script id="template" type="text/x-template">
+        <div>
+          <h2>{% rank %}</h2>
+          <p>{% client_name %}{% count %}</p>
+        </div>
+      </script>
+      <h1>Twitterクライアント人気ランキング(最新つぶやき20件の結果)</h1>
+      <div id="result">
+      </div>
+    </body>
+</html>
