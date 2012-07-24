@@ -19,8 +19,10 @@ Template.prototype = {
 
 //htmlエスケープ関数
 function htmlEscape(string) {
-    string = string.replace(/&/g,"&amp;");
-    string = string.replace(/</g,"&lt;");
-    string = string.replace(/>/g,"&gt;");
+    if(string.replace) { //stringでreplaceメソッドが存在する時のみ実行
+        string = string.replace(/&/g,"&amp;");
+        string = string.replace(/</g,"&lt;");
+        string = string.replace(/>/g,"&gt;");
+    }
     return string;
 }
