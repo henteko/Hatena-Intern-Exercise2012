@@ -24,15 +24,11 @@ sub render {
     my @html = <TMP_HTML>;
 
     my %hash = %$data; #リファレンスをhashに変換
-
-    #入力文字列をhtmlエスケープ
-    foreach(keys %hash) {
-        $hash{$_} = encode_entities($hash{$_} , qw(&<>"'));
-    }
     
     my $out_html; #out用html
     foreach(@html) {
         if(&comment_delete($_)) {next;} #テンプレートコメントは削除する為次に進む
+        unless(&template_if(\$_ , \%hash)) {next;}
         $out_html .= &replace_variable($_,\%hash); #変数置換関数呼び出し #out用htmlに付け足して行く
     }
     close TMP_HTML;
@@ -48,7 +44,12 @@ sub render {
 sub replace_variable {
     my($s , $refa) = @_;
     my %hash = %$refa;
-    $s =~ s/{%\s*(?<name>\w+)\s*%}/$hash{$+{name}}/g;
+    if(/{%\s*(?<name>\w+)\s*%}/) {
+        #htmlエスケープ処理
+        my $value = encode_entities($hash{$+{name}} , qw(&<>"'));
+        #htmlエスケケープした値で置換
+        $s =~ s/{%\s*(?<name>\w+)\s*%}/$value/g;
+    }
     return $s;
 }
 
@@ -60,6 +61,21 @@ sub replace_variable {
 sub comment_delete {
     my($s) = @_;
     return $s =~ /{!!.*!!}/;
+}
+
+sub template_if {
+    my $value = $_[0];
+    my $hash = $_[1];
+    my %hash = %$hash;
+    my $flag =  1; #set true
+    if($$value =~ /{if\s*(?<name>\w+)\s*}/) {
+        $flag = $hash{$+{name}};
+        if($flag) { $$value =~ s/{if\s*\w+\s*}//g;}
+    }elsif ($$value =~ /unless\s*(?<name>\w+)\s*}/) {
+        $flag = !$hash{$+{name}};
+        if($flag) { $$value =~ s/{unless\s*\w+\s*}//g;}
+    }
+    return $flag;
 }
 
 

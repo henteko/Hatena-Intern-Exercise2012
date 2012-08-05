@@ -4,6 +4,9 @@
     <title>{% title %}</title>
   </head>
   <body>
+    {!! print "hogehoge" if flag; 的な感じで使える !!}
+    <p>{% flag %}</p>{if flag}
+    <p>{% flag %}</p>{unless flag}
     {!! ここも削除されます  !!}
     <p>{% content %}</p>
   </body>

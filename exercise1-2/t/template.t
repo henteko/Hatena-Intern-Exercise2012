@@ -15,6 +15,7 @@ my $expected = <<'HTML';
     <title>タイトル</title>
   </head>
   <body>
+    <p>1</p>
     <p>これはコンテンツです。&amp;&lt;&gt;&quot;</p>
   </body>
 </html>
@@ -26,6 +27,7 @@ chomp $expected;
 cmp_ok $template->render({
     title   => 'タイトル',
     content => 'これはコンテンツです。&<>"',
+    flag => 1,
 }), 'eq', $expected; 
 
 
