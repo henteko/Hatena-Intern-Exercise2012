@@ -74,12 +74,12 @@ sub template_if {
     my $hash = $_[1];
     my %hash = %$hash;
     my $flag =  1; #set true
-    if($$value =~ /{if\s*(?<name>\w+)\s*}/) {
+    if($$value =~ /{%if\s*(?<name>\w+)\s*%}/) {
         $flag = $hash{$+{name}};
-        if($flag) { $$value =~ s/{if\s*\w+\s*}//g;}
-    }elsif ($$value =~ /unless\s*(?<name>\w+)\s*}/) {
+        if($flag) { $$value =~ s/{%if\s*\w+\s*%}//g;}
+    }elsif ($$value =~ /{%unless\s*(?<name>\w+)\s*%}/) {
         $flag = !$hash{$+{name}};
-        if($flag) { $$value =~ s/{unless\s*\w+\s*}//g;}
+        if($flag) { $$value =~ s/{%unless\s*\w+\s*%}//g;}
     }
     return $flag;
 }
