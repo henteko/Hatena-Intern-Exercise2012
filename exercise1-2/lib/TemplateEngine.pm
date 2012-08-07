@@ -28,7 +28,7 @@ sub render {
     my $out_html; #out用html
     foreach(@html) {
         if(&comment_delete($_)) {next;} #テンプレートコメントは削除する為次に進む
-        unless(&template_if(\$_ , \%hash)) {next;}
+        unless(&template_if(\$_ , \%hash)) {next;} #if制御
         $out_html .= &replace_variable($_,\%hash); #変数置換関数呼び出し #out用htmlに付け足して行く
     }
     close TMP_HTML;
@@ -63,6 +63,12 @@ sub comment_delete {
     return $s =~ /{!!.*!!}/;
 }
 
+#if制御関数
+#引数:
+#1:置換対象文字列のリファレンス
+#2:置換後文字列のハッシュリファレンス
+#返り値:
+#if制御するかどうかのbool値
 sub template_if {
     my $value = $_[0];
     my $hash = $_[1];
